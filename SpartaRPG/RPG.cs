@@ -49,9 +49,10 @@ namespace ConsoleApp2
 
         public void StatusOpen()
         {
-            int select = -1;
+            int select;
             do
             {
+                select = -1;
                 Console.Clear();
                 Console.WriteLine("\n-------------------------------------------\n");
                 Console.WriteLine("\t\t상태 보기");
@@ -78,9 +79,9 @@ namespace ConsoleApp2
                     break;
                 Console.WriteLine("0. 나가기");
                 Console.Write("원하는 행동을 입력해주세요: ");
+                
 
-
-            } while (int.TryParse(Console.ReadLine(), out select) && select != 0);
+            } while ((!int.TryParse(Console.ReadLine(), out select)) || select != 0);
             
         }
 
