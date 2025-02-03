@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -225,12 +226,60 @@ namespace ConsoleApp2
         }
         public void ShopMenu(Player player)
         {
+            int count = 1;
             Console.WriteLine("\n-------------------------------------------\n");
             Console.WriteLine("상점");
             Console.WriteLine("\n-------------------------------------------");
             foreach (ShopItem item in shopList) 
             {
+                Console.Write("-" +count+" ");
                 item.Inform();
+                count++;
+            }
+            ShopBuy(player);
+        }
+
+        public void ShopBuy(Player player)
+        {
+            int buy;
+            Console.WriteLine("\n-------------------------------------------\n");
+            Console.WriteLine("현재 G : " + player.Gold + "G\n");
+            Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ 구매할 아이템 번호)");
+            while(!int.TryParse(Console.ReadLine(), out buy))
+            {
+                Console.WriteLine("아이템 번호가 존재하지 않습니다.");
+                Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ 구매할 아이템 번호)");
+            }
+            
+            if (buy > 0 && buy <= shopList.Count)
+            {
+                buy--;
+                if (!shopList[buy].IsBuy)
+                {
+                    if (player.Gold >= shopList[buy].Price)
+                    {
+                        ShopItem selectItem = shopList[buy];
+                        player.Gold -= selectItem.Price;
+                        MyItem buyedItem = new MyItem(selectItem.Name, selectItem.Category, selectItem.Stat, selectItem.Descript);
+                        player.Inventory.Add(player.Inventory.Count, buyedItem);
+                        selectItem.IsBuy = true;
+
+                        Console.WriteLine("아이템을 구매하였습니다.");
+                        Console.WriteLine("현재 G : " + player.Gold + "G\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("소지한 골드가 부족합니다.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("이미 구매한 아이템입니다.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다. 마을로 돌아갑니다.");
             }
         }
     }
