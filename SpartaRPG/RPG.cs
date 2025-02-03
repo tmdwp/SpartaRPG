@@ -8,33 +8,47 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    public struct Item
+    public enum ItemCategory
     {
-        public string Name;
-        public int Category;
-        public int Stat;
-        public string Descript;
-        public bool IsEquip;
+        Weapon = 1,
+        Armor
+    }
 
-        public Item(string name,  int category, int stat, string descript)
+    public interface Item
+    {
+        public string Name {  get; }
+        public int Category {  get;}
+        public int Stat {  get; set; }
+        public string Descript { get;}
+    }
+
+    public class MyItem : Item
+    {
+        public string Name { get; set; }
+        public int Category { get; set; }
+        public int Stat { get; set; }
+        public string Descript { get; set; }
+        public bool IsEquip;
+ 
+        public MyItem(string name,  int category, int stat, string descript)
         {
-            this.Name = name;
-            this.Category = category;
-            this.Stat = stat;
-            this.Descript = descript;
-            this.IsEquip = false;
+            Name = name;
+            Category = category;
+            Stat = stat;
+            Descript = descript;
+            IsEquip = false;
         }
 
         public void Equip(Player player)
         {
             if (IsEquip == false)
             {
-                if (Category == 1)
+                if (Category == (int)ItemCategory.Weapon)
                 {
                     player.Attack += Stat;
                     player.EquipAttack += Stat;
                 }
-                else if (Category == 2)
+                else if (Category == (int)ItemCategory.Armor)
                 {
                     player.Defense += Stat;
                     player.EquipDefense += Stat;
@@ -44,9 +58,15 @@ namespace ConsoleApp2
             else
             {
                 if (Category == 1)
+                {
+                    player.Attack -= Stat;
                     player.EquipAttack -= Stat;
+                }
                 else if (Category == 2)
+                {
+                    player.Defense -= Stat;
                     player.EquipDefense -= Stat;
+                }
                 IsEquip = false;
             }
         }
@@ -62,7 +82,36 @@ namespace ConsoleApp2
         }
     }
 
+    public class ShopItem : Item
+    {
+        public string Name { get; set; }
+        public int Category { get; set; }
+        public int Stat { get; set; }
+        public string Descript { get; set; }
+        public bool IsBuy;
+        public int Price;
+        public ShopItem(string name, int category, int stat, string descript, int price)
+        {
+            Name = name;
+            Category = category;
+            Stat = stat;
+            Descript = descript;
+            IsBuy = false;
+            Price = price;
+        }
 
+        public void Inform()
+        {
+            if (Category == 1)
+                Console.Write(Name + " | 공격력 +" + Stat + " | " + Descript);
+            else Console.Write(Name + " | 방어력 +" + Stat + " | " + Descript);
+            if (IsBuy)
+            {
+                Console.WriteLine(" | 구매 완료");
+            }
+            else Console.WriteLine(" | " + Price+" G");
+        }
+    }
     public interface ICharacter
     {
         string Name { get; }
@@ -83,7 +132,7 @@ namespace ConsoleApp2
         public int Defense { get; set; }
         public int Gold { get; set; }
 
-        public Dictionary<int, Item> Inventory { get; set; }
+        public Dictionary<int, MyItem> Inventory { get; set; }
 
         public int EquipAttack = 0;
         public int EquipDefense = 0;
@@ -96,12 +145,12 @@ namespace ConsoleApp2
             Attack = 10;
             Defense = 5;
             Gold = 1500;
-            Inventory = new Dictionary<int, Item>();
+            Inventory = new Dictionary<int, MyItem>();
         }
 
         public void StatusOpen()
         {
-            Console.WriteLine("\n-------------------------------------------");
+            Console.WriteLine("\n-------------------------------------------\n");
             Console.WriteLine("상태 보기");
             Console.WriteLine("\n-------------------------------------------");
             Console.WriteLine("Lv." + Level);
@@ -125,11 +174,11 @@ namespace ConsoleApp2
 
         public void OpenInventory()
         {
-            Console.WriteLine("\n-------------------------------------------");
+            Console.WriteLine("\n-------------------------------------------\n");
             Console.WriteLine("인벤토리");
             Console.WriteLine("\n-------------------------------------------");
             int count = 1;
-            foreach (Item item in Inventory.Values)
+            foreach (MyItem item in Inventory.Values)
             {
                 Console.Write("-"+count+" ");
                 item.Inform();
@@ -157,11 +206,38 @@ namespace ConsoleApp2
         }
     }
 
+    public class Shop
+    {
+        private List<ShopItem> shopList;
+        public Shop()
+        {
+            shopList = new List<ShopItem>();
 
+        }
+        public void SettingShop()
+        {
+            shopList.Add(new ShopItem("수련자 갑옷", (int)ItemCategory.Armor, 5, "수련자용 갑옷이다.", 500));
+            shopList.Add(new ShopItem("무쇠 갑옷", (int)ItemCategory.Armor, 9, "무쇠로 만든 갑옷이다.", 1000));
+            shopList.Add(new ShopItem("강철 갑옷", (int)ItemCategory.Armor, 15, "강철로 만든 갑옷이다.", 2000));
+            shopList.Add(new ShopItem("목검", (int)ItemCategory.Weapon, 3, "생각보다 단단한 목검이다.", 500));
+            shopList.Add(new ShopItem("훈련용 검", (int)ItemCategory.Weapon, 5, "훈련용이지만 날이 서있는 검이다.", 1200));
+            shopList.Add(new ShopItem("매우 무거운 검", (int)ItemCategory.Weapon, 15, "많이 무거운 검이다. 다치지 않게 조심하자.", 2300));
+        }
+        public void ShopMenu(Player player)
+        {
+            Console.WriteLine("\n-------------------------------------------\n");
+            Console.WriteLine("상점");
+            Console.WriteLine("\n-------------------------------------------");
+            foreach (ShopItem item in shopList) 
+            {
+                item.Inform();
+            }
+        }
+    }
 
     public class Town
     {
-        public void Start(Player player)
+        public void Start(Player player, Shop shop)
         {
             while (true)
             {
@@ -191,6 +267,7 @@ namespace ConsoleApp2
                         break;
                     case 3:
                         Console.Clear();
+                        shop.ShopMenu(player);
                         break;
                     default:
                         Console.WriteLine("정해진 행동이 아닙니다. 게임하기 싫으시군요?");
@@ -209,10 +286,12 @@ namespace ConsoleApp2
             Console.WriteLine("당신의 이름은?");
             string name = Console.ReadLine();
             Player player = new Player(name);
-            Item item = new Item("낡은 나무검", 1, 1, "낡은 나무 검이다");
+            MyItem item = new MyItem("낡은 나무검", 1, 1, "낡은 나무 검이다");
             player.Inventory.Add(player.Inventory.Count, item);
             Town town = new Town();
-            town.Start(player);
+            Shop shop = new Shop();
+            shop.SettingShop();
+            town.Start(player, shop);
         }
     }
 }
