@@ -49,85 +49,94 @@ namespace ConsoleApp2
 
         public void StatusOpen()
         {
-            Console.WriteLine("\n-------------------------------------------\n");
-            Console.WriteLine("\t\t상태 보기");
-            Console.WriteLine("\n-------------------------------------------");
-            Console.WriteLine("Lv." + Level);
-            Console.WriteLine(Name+"("+Job+")");
-            Console.Write("공격력: " + Attack);
-            if (EquipAttack != 0)
-            {
-                Console.WriteLine("(+" + EquipAttack + ")");
-            }
-            else Console.WriteLine();
-            Console.Write("방어력: " + Defense);
-            if (EquipDefense != 0)
-            {
-                Console.WriteLine("(+" + EquipDefense + ")");
-            }
-            else Console.WriteLine();
-            Console.WriteLine("체력: "+ Health);
-            Console.WriteLine("Gold: " + Gold);
-            Console.WriteLine("\n-------------------------------------------");
             int select = -1;
             do
             {
+                Console.Clear();
+                Console.WriteLine("\n-------------------------------------------\n");
+                Console.WriteLine("\t\t상태 보기");
+                Console.WriteLine("\n-------------------------------------------");
+                Console.WriteLine("Lv." + Level);
+                Console.WriteLine(Name + "(" + Job + ")");
+                Console.Write("공격력: " + Attack);
+                if (EquipAttack != 0)
+                {
+                    Console.WriteLine("(+" + EquipAttack + ")");
+                }
+                else Console.WriteLine();
+                Console.Write("방어력: " + Defense);
+                if (EquipDefense != 0)
+                {
+                    Console.WriteLine("(+" + EquipDefense + ")");
+                }
+                else Console.WriteLine();
+                Console.WriteLine("체력: " + Health);
+                Console.WriteLine("Gold: " + Gold);
+                Console.WriteLine("\n-------------------------------------------");
+
                 if (select == 0)
                     break;
                 Console.WriteLine("0. 나가기");
                 Console.Write("원하는 행동을 입력해주세요: ");
 
 
-            } while (int.TryParse(Console.ReadLine(), out select) && select == -1);
-
+            } while (int.TryParse(Console.ReadLine(), out select) && select != 0);
+            
         }
 
         public void OpenInventory()
         {
-            Console.WriteLine("\n-------------------------------------------\n");
-            Console.WriteLine("\t\t인벤토리");
-            Console.WriteLine("\n-------------------------------------------");
-            Console.WriteLine("\t\t[ 아이템 목록 ]");
-            int input = 1;
-            foreach (MyItem item in Inventory.Values)
+            int input = -1;
+            do
             {
-                item.Inform();
-            }
-            Console.WriteLine("\n-------------------------------------------\n");
+                Console.Clear();
+                Console.WriteLine("\n-------------------------------------------\n");
+                Console.WriteLine("\t\t인벤토리");
+                Console.WriteLine("\n-------------------------------------------");
+                Console.WriteLine("\t\t[ 아이템 목록 ]");
 
-            Console.WriteLine("\n다음 행동? 0 : 나가기 1: 장비 장착 관리");
-            while(!int.TryParse(Console.ReadLine(), out input)){
-                Console.WriteLine("잘못된 입력입니다.");
-            }
-            if (input == 1)
-            {
                 foreach (MyItem item in Inventory.Values)
                 {
-                    Console.Write("- " + input + " ");
                     item.Inform();
-                    input++;
                 }
-                Console.Write("\n 장착/장착 해제할 아이템 : (0 - 나가기 | 장비 번호 - 장착/해제)");
+                Console.WriteLine("\n-------------------------------------------\n");
+
+                Console.WriteLine("\n다음 행동? 0 : 나가기 1: 장비 장착 관리");
                 while (!int.TryParse(Console.ReadLine(), out input))
                 {
                     Console.WriteLine("잘못된 입력입니다.");
                 }
-                if (input != 0)
+                if (input == 0)
+                    break;
+                else if (input == 1)
                 {
-                    input--;
-                    if (input < Inventory.Count)
+                    foreach (MyItem item in Inventory.Values)
                     {
-                        Inventory[input].Equip(this);
-                        Console.WriteLine("아이템을 장착했습니다");
-                        StatusOpen();
+                        Console.Write("- " + input + " ");
+                        item.Inform();
+                        input++;
                     }
-                    else
+                    Console.Write("\n 장착/장착 해제할 아이템 : (0 - 나가기 | 장비 번호 - 장착/해제)");
+                    while (!int.TryParse(Console.ReadLine(), out input))
                     {
-                        Console.WriteLine("잘못된 입력입니다. 마을로 돌아갑니다.");
+                        Console.WriteLine("잘못된 입력입니다.");
                     }
+                    if (input != 0)
+                    {
+                        input--;
+                        if (input < Inventory.Count)
+                        {
+                            Inventory[input].Equip(this);
+                            Console.WriteLine("아이템을 장착했습니다");
+                        }
+                        else
+                        {
+                            Console.WriteLine("잘못된 입력입니다. 마을로 돌아갑니다.");
+                        }
+                    }
+                    input = -1;
                 }
-
-            }
+            } while (input != 0);
         }
     }
 
@@ -268,6 +277,7 @@ namespace ConsoleApp2
     public class Shop
     {
         private List<ShopItem> shopList; //상점 목록
+        int buy;
         public Shop()
         {
             shopList = new List<ShopItem>();
@@ -286,30 +296,38 @@ namespace ConsoleApp2
         public void ShopMenu(Player player) //상점 아이템 목록 출력
         {
             int count = 1;
-            Console.WriteLine("\n-------------------------------------------\n");
-            Console.WriteLine("\t\t상점");
-            Console.WriteLine("\n-------------------------------------------");
-            foreach (ShopItem item in shopList) 
+            do
             {
-                Console.Write("- " +count+" ");
-                item.Inform();
-                count++;
-            }
-            ShopBuy(player);
+                Console.Clear();
+                Console.WriteLine("\n-------------------------------------------\n");
+                Console.WriteLine("\t\t상점");
+                Console.WriteLine("\n-------------------------------------------");
+
+                foreach (ShopItem item in shopList)
+                {
+                    Console.Write("- " + count + " ");
+                    item.Inform();
+                    count++;
+                }
+
+                ShopBuy(player);
+                if (buy == 0)
+                    break;
+                count = 1;
+            } while (buy != 0);
         }
 
         public void ShopBuy(Player player) //아이템 구매
         {
-            int buy;
+
             Console.WriteLine("\n-------------------------------------------\n");
             Console.WriteLine("현재 G : " + player.Gold + "G\n");
             Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ " + shopList.Count + " - 구매할 아이템 번호)");
             while (!int.TryParse(Console.ReadLine(), out buy))
             {
                 Console.WriteLine("잘못된 입력입니다.");
-                Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ " + shopList.Count +" - 구매할 아이템 번호)");
+                Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ " + shopList.Count + " - 구매할 아이템 번호)");
             }
-            
             if (buy > 0 && buy <= shopList.Count)
             {
                 buy--;
@@ -335,10 +353,12 @@ namespace ConsoleApp2
                 {
                     Console.WriteLine("이미 구매한 아이템입니다.");
                 }
+                buy++;
+                Console.ReadLine();
             }
-            else
+            else if(buy !=0)
             {
-                Console.WriteLine("아이템 번호가 존재하지 않습니다. 마을로 돌아갑니다.");
+                Console.WriteLine("아이템 번호가 존재하지 않습니다.");
             }
         }
     }
