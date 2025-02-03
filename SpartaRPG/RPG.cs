@@ -9,110 +9,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    public enum ItemCategory
-    {
-        Weapon = 1,
-        Armor
-    }
-
-    public interface Item
-    {
-        public string Name {  get; }
-        public int Category {  get;}
-        public int Stat {  get; set; }
-        public string Descript { get;}
-    }
-
-    public class MyItem : Item
-    {
-        public string Name { get; set; }
-        public int Category { get; set; }
-        public int Stat { get; set; }
-        public string Descript { get; set; }
-        public bool IsEquip;
- 
-        public MyItem(string name,  int category, int stat, string descript)
-        {
-            Name = name;
-            Category = category;
-            Stat = stat;
-            Descript = descript;
-            IsEquip = false;
-        }
-
-        public void Equip(Player player)
-        {
-            if (IsEquip == false)
-            {
-                if (Category == (int)ItemCategory.Weapon)
-                {
-                    player.Attack += Stat;
-                    player.EquipAttack += Stat;
-                }
-                else if (Category == (int)ItemCategory.Armor)
-                {
-                    player.Defense += Stat;
-                    player.EquipDefense += Stat;
-                }
-                IsEquip = true;
-            }
-            else
-            {
-                if (Category == 1)
-                {
-                    player.Attack -= Stat;
-                    player.EquipAttack -= Stat;
-                }
-                else if (Category == 2)
-                {
-                    player.Defense -= Stat;
-                    player.EquipDefense -= Stat;
-                }
-                IsEquip = false;
-            }
-        }
-        public void Inform()
-        {
-            if (IsEquip == true)
-            {
-                Console.Write("[E]");
-            }
-            if (Category == 1)
-                Console.WriteLine(Name + " | 공격력 +" + Stat + " | " + Descript);
-            else Console.WriteLine(Name + " | 방어력 +" + Stat + " | " + Descript);
-        }
-    }
-
-    public class ShopItem : Item
-    {
-        public string Name { get; set; }
-        public int Category { get; set; }
-        public int Stat { get; set; }
-        public string Descript { get; set; }
-        public bool IsBuy;
-        public int Price;
-        public ShopItem(string name, int category, int stat, string descript, int price)
-        {
-            Name = name;
-            Category = category;
-            Stat = stat;
-            Descript = descript;
-            IsBuy = false;
-            Price = price;
-        }
-
-        public void Inform()
-        {
-            if (Category == 1)
-                Console.Write(Name + " | 공격력 +" + Stat + " | " + Descript);
-            else Console.Write(Name + " | 방어력 +" + Stat + " | " + Descript);
-            if (IsBuy)
-            {
-                Console.WriteLine(" | 구매 완료");
-            }
-            else Console.WriteLine(" | " + Price+" G");
-        }
-    }
+    //캐릭터 관련
     public interface ICharacter
     {
         string Name { get; }
@@ -123,6 +20,7 @@ namespace ConsoleApp2
         string Job { get; }
     }
 
+    //플레이어 정보
     public class Player : ICharacter
     {
         public int Level { get; set; }
@@ -141,7 +39,7 @@ namespace ConsoleApp2
         {
             Level = 1;
             Name = name;
-            Job = "Warrior";
+            Job = "전사";
             Health = 100;
             Attack = 10;
             Defense = 5;
@@ -181,7 +79,7 @@ namespace ConsoleApp2
             int count = 1;
             foreach (MyItem item in Inventory.Values)
             {
-                Console.Write("-"+count+" ");
+                Console.Write("- "+count+" ");
                 item.Inform();
                 count++;
             }
@@ -207,9 +105,121 @@ namespace ConsoleApp2
         }
     }
 
+    //아이템 관련
+    public interface Item
+    {
+        public string Name {  get; }
+        public int Category {  get;}
+        public int Stat {  get; set; }
+        public string Descript { get;}
+    }
+
+    public enum ItemCategory //아이템 카테고리 분류
+    {
+        Weapon = 1,
+        Armor
+    }
+
+    //내가 가진 아이템
+    public class MyItem : Item
+    {
+        public string Name { get; set; }
+        public int Category { get; set; }
+        public int Stat { get; set; }
+        public string Descript { get; set; }
+        public bool IsEquip;
+ 
+        public MyItem(string name,  int category, int stat, string descript)
+        {
+            Name = name;
+            Category = category;
+            Stat = stat;
+            Descript = descript;
+            IsEquip = false;
+        }
+
+        public void Equip(Player player)
+        {
+            switch (Category)
+            {
+                case (int)ItemCategory.Weapon:
+                    if (IsEquip == false)
+                    {
+                        player.Attack += Stat;
+                        player.EquipAttack += Stat;
+                        IsEquip = true;
+                    }
+                    else
+                    {
+                        player.Attack -= Stat;
+                        player.EquipAttack -= Stat;
+                        IsEquip = false;
+                    }
+                    break;
+                case (int)ItemCategory.Armor:
+                    if (IsEquip == false)
+                    {
+                        player.Defense += Stat;
+                        player.EquipDefense += Stat;
+                    }
+                    else
+                    {
+                        player.Defense -= Stat;
+                        player.EquipDefense -= Stat;
+                        IsEquip = false;
+                    }
+                    break;
+            }
+
+        }
+        public void Inform()
+        {
+            if (IsEquip == true)
+            {
+                Console.Write("[E]");
+            }
+            if (Category == 1)
+                Console.WriteLine(Name + " | 공격력 +" + Stat + " | " + Descript);
+            else Console.WriteLine(Name + " | 방어력 +" + Stat + " | " + Descript);
+        }
+    } 
+
+    //상점 아이템
+    public class ShopItem : Item
+    {
+        public string Name { get; set; }
+        public int Category { get; set; }
+        public int Stat { get; set; }
+        public string Descript { get; set; }
+        public bool IsBuy;
+        public int Price;
+        public ShopItem(string name, int category, int stat, string descript, int price)
+        {
+            Name = name;
+            Category = category;
+            Stat = stat;
+            Descript = descript;
+            IsBuy = false;
+            Price = price;
+        }
+
+        public void Inform()
+        {
+            if (Category == 1)
+                Console.Write(Name + " | 공격력 +" + Stat + " | " + Descript);
+            else Console.Write(Name + " | 방어력 +" + Stat + " | " + Descript);
+            if (IsBuy)
+            {
+                Console.WriteLine(" | 구매 완료");
+            }
+            else Console.WriteLine(" | " + Price + " G");
+        }
+    }
+
+    //상점
     public class Shop
     {
-        private List<ShopItem> shopList;
+        private List<ShopItem> shopList; //상점 목록
         public Shop()
         {
             shopList = new List<ShopItem>();
@@ -224,7 +234,7 @@ namespace ConsoleApp2
             shopList.Add(new ShopItem("훈련용 검", (int)ItemCategory.Weapon, 5, "훈련용이지만 날이 서있는 검이다.", 1200));
             shopList.Add(new ShopItem("매우 무거운 검", (int)ItemCategory.Weapon, 15, "많이 무거운 검이다. 다치지 않게 조심하자.", 2300));
         }
-        public void ShopMenu(Player player)
+        public void ShopMenu(Player player) //상점 아이템 목록 출력
         {
             int count = 1;
             Console.WriteLine("\n-------------------------------------------\n");
@@ -232,14 +242,14 @@ namespace ConsoleApp2
             Console.WriteLine("\n-------------------------------------------");
             foreach (ShopItem item in shopList) 
             {
-                Console.Write("-" +count+" ");
+                Console.Write("- " +count+" ");
                 item.Inform();
                 count++;
             }
             ShopBuy(player);
         }
 
-        public void ShopBuy(Player player)
+        public void ShopBuy(Player player) //아이템 구매
         {
             int buy;
             Console.WriteLine("\n-------------------------------------------\n");
@@ -247,7 +257,7 @@ namespace ConsoleApp2
             Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ 구매할 아이템 번호)");
             while(!int.TryParse(Console.ReadLine(), out buy))
             {
-                Console.WriteLine("아이템 번호가 존재하지 않습니다.");
+                Console.WriteLine("잘못된 입력입니다.");
                 Console.WriteLine("구매할 아이템을 선택하세요 ( 0 - 나가기 | 1 ~ 구매할 아이템 번호)");
             }
             
@@ -279,14 +289,15 @@ namespace ConsoleApp2
             }
             else
             {
-                Console.WriteLine("잘못된 입력입니다. 마을로 돌아갑니다.");
+                Console.WriteLine("아이템 번호가 존재하지 않습니다. 마을로 돌아갑니다.");
             }
         }
     }
 
+    //마을
     public class Town
     {
-        public void Start(Player player, Shop shop)
+        public void Start(Player player, Shop shop) //마을 입장 시
         {
             while (true)
             {
@@ -297,7 +308,7 @@ namespace ConsoleApp2
                 Console.WriteLine("2. 인벤토리");
                 Console.WriteLine("3. 상점\n");
                 Console.WriteLine("원하는 행동을 선택해주세요.(1~3)");
-                int move;
+                int move; //선택한 행동
                 while (!int.TryParse(Console.ReadLine(), out move))
                 {
                     Console.WriteLine("정해진 행동의 번호가 아닙니다.");
@@ -335,11 +346,11 @@ namespace ConsoleApp2
             Console.WriteLine("당신의 이름은?");
             string name = Console.ReadLine();
             Player player = new Player(name);
-            MyItem item = new MyItem("낡은 나무검", 1, 1, "낡은 나무 검이다");
+            MyItem item = new MyItem("낡은 나무검", 1, 1, "낡은 나무 검이다"); //인벤토리 작동 여부 확인 겸 기본 제공 무기
             player.Inventory.Add(player.Inventory.Count, item);
             Town town = new Town();
             Shop shop = new Shop();
-            shop.SettingShop();
+            shop.SettingShop(); //상점 목록 초기화
             town.Start(player, shop);
         }
     }
