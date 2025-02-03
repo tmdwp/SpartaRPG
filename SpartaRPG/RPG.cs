@@ -90,10 +90,10 @@ namespace ConsoleApp2
             do
             {
                 Console.Clear();
-                Console.WriteLine("\n-------------------------------------------\n");
-                Console.WriteLine("\t\t인벤토리");
-                Console.WriteLine("\n-------------------------------------------");
-                Console.WriteLine("\t\t[ 아이템 목록 ]");
+                Console.WriteLine("\n-------------------------------------------" +
+                    "\n\t\t인벤토리\n\n-------------------------------------------" +
+                    "\n\t\t[ 아이템 목록 ]\n");
+
 
                 foreach (MyItem item in Inventory.Values)
                 {
@@ -110,12 +110,17 @@ namespace ConsoleApp2
                     break;
                 else if (input == 1)
                 {
+                    Console.Clear();
+                    Console.WriteLine("\n-------------------------------------------" +
+                        "\n\t\t인벤토리\n\n-------------------------------------------" +
+                        "\n\t\t[ 아이템 목록 ]\n");
                     foreach (MyItem item in Inventory.Values)
                     {
                         Console.Write("- " + input + " ");
                         item.Inform();
                         input++;
                     }
+                    Console.WriteLine("\n-------------------------------------------\n");
                     Console.Write("\n 장착/장착 해제할 아이템 : (0 - 나가기 | 장비 번호 - 장착/해제)");
                     while (!int.TryParse(Console.ReadLine(), out input))
                     {
@@ -229,12 +234,19 @@ namespace ConsoleApp2
             {
                 Console.Write("[E]");
             }
-            if (Category == (int)ItemCategory.Weapon)
-                Console.WriteLine(Name + " | 공격력 +" + Stat + " | " + Descript);
-            else if (Category == (int)ItemCategory.Armor)
-                Console.WriteLine(Name + " | 방어력 +" + Stat + " | " + Descript);
-            else if (Category == (int)ItemCategory.chaos)
-                Console.WriteLine(Name + " | ???? | " + Descript);
+
+            switch (Category)
+            {
+                case (int)ItemCategory.Weapon:
+                    Console.WriteLine(Name + " | 공격력 +" + Stat + " | " + Descript);
+                    break;
+                case (int)ItemCategory.Armor:
+                    Console.WriteLine(Name + " | 방어력 +" + Stat + " | " + Descript);
+                    break;
+                case (int)ItemCategory.chaos:
+                    Console.WriteLine(Name + " | ???? | " + Descript);
+                    break;
+            }
         }
     } 
 
@@ -259,12 +271,18 @@ namespace ConsoleApp2
 
         public void Inform()
         {
-            if (Category == (int)ItemCategory.Weapon)
-                Console.Write(Name + " | 공격력 +" + Stat + " | " + Descript);
-            else if(Category == (int)ItemCategory.Armor)
-                Console.Write(Name + " | 방어력 +" + Stat + " | " + Descript);
-            else if (Category == (int)ItemCategory.chaos)
-                Console.Write(Name + " | ? | " + Descript);
+            switch (Category)
+            {
+                case (int)ItemCategory.Weapon:
+                    Console.Write(Name + " | 공격력 +" + Stat + " | " + Descript);
+                    break;
+                case (int)ItemCategory.Armor:
+                    Console.Write(Name + " | 방어력 +" + Stat + " | " + Descript);
+                    break;
+                case (int)ItemCategory.chaos:
+                    Console.Write(Name + " | ? | " + Descript);
+                    break;
+            }
             if (IsBuy)
             {
                 Console.WriteLine(" | 구매 완료");
@@ -337,8 +355,8 @@ namespace ConsoleApp2
                     {
                         ShopItem selectItem = shopList[buy];
                         player.Gold -= selectItem.Price;
-                        MyItem buyedItem = new MyItem(selectItem.Name, selectItem.Category, selectItem.Stat, selectItem.Descript);
-                        player.Inventory.Add(player.Inventory.Count, buyedItem);
+                        MyItem buyItem = new MyItem(selectItem.Name, selectItem.Category, selectItem.Stat, selectItem.Descript);
+                        player.Inventory.Add(player.Inventory.Count, buyItem);
                         selectItem.IsBuy = true;
 
                         Console.WriteLine("아이템을 구매하였습니다.");
